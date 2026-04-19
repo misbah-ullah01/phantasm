@@ -2,3 +2,5 @@
 /PHANTASM_Detailed_Guide.md
 *.md
 !README.md
+*.env
+*.log
