@@ -6,6 +6,19 @@ Blue Green zero-downtime deployment visualizer. Two app versions run simultaneou
 
 Push Code → GitHub Actions builds and deploys → zero downtime.
 
+---
+
+## Table of Contents
+
+1. [Project Overview](#project-overview)
+2.
+
+---
+
+## Project Overview
+
+---
+
 ## Team
 
 | Member         | Role                              |
@@ -72,6 +85,7 @@ Push Code → GitHub Actions builds and deploys → zero downtime.
 ## Quick Start
 
 ### Prerequisites
+
 - Docker and Docker Compose installed
 - Node.js 18+
 - AWS account (for cloud deployment)
@@ -84,28 +98,30 @@ cd phantasm
 cd .env.example .env    # fill in your Docker Hub username
 docker compose up --build
 ```
-Open:
--
+
+## Open:
+
 - App: http://localhost
 - Dashboard: http://localhost:3000
 - Controller API: http://localhost:3000/split
 
 ### Cloud URL
+
 ```
 http://YOUR_EC2_ELASTIC_IP
 ```
+
 ---
+
 ## Tech Stack
-|Layer|Technology|
-|---|---|
-| App (x2) | Node.js + Express |
+
+| Layer          | Technology              |
+| -------------- | ----------------------- |
+| App (x2)       | Node.js + Express       |
 | Traffic Router | Nginx weighted upstream |
-| Orchestration | Docker Compose |
-| CI/CD | GitHub Actions |
-| Registry | Docker Hub |
-| Cloud | AWS EC2 (Ubuntu 22.04) |
-| Dashboard | Node.js + Socket.io |
-| IaC | Terraform |
-
-
-
+| Orchestration  | Docker Compose          |
+| CI/CD          | GitHub Actions          |
+| Registry       | Docker Hub              |
+| Cloud          | AWS EC2 (Ubuntu 22.04)  |
+| Dashboard      | Node.js + Socket.io     |
+| IaC            | Terraform               |
