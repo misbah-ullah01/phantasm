@@ -112,16 +112,40 @@ Build a complete system that:
 
 ## Technology Stack
 
-| Layer          | Technology              |
-| -------------- | ----------------------- |
-| App (x2)       | Node.js + Express       |
-| Traffic Router | Nginx weighted upstream |
-| Orchestration  | Docker Compose          |
-| CI/CD          | GitHub Actions          |
-| Registry       | Docker Hub              |
-| Cloud          | AWS EC2 (Ubuntu 22.04)  |
-| Dashboard      | Node.js + Socket.io     |
-| IaC            | Terraform               |
+### Application Layer
+
+| Component       | Technology         | Version   | Purpose                         |
+| --------------- | ------------------ | --------- | ------------------------------- |
+| Blue App        | Node.js + Express  | 18-alpine | Production version v1.0         |
+| Green App       | Node.js + Express  | 18-alpine | New version v2.0 with search    |
+| Language        | JavaScript (plain) | ES5/ES6   | No TypeScript, no transpilation |
+| Package Manager | npm                | 9+        | Dependency management           |
+
+### Infrastructure Layer
+
+| Component     | Technology     | Version          | Purpose                               |
+| ------------- | -------------- | ---------------- | ------------------------------------- |
+| Reverse Proxy | Nginx          | 1.25-alpine      | Route traffic, weighted upstream      |
+| Orchestration | Docker Compose | 3.8              | Local and cloud container management  |
+| Registry      | Docker Hub     | -                | Store and distribute images           |
+| Cloud         | AWS EC2        | Ubuntu 22.04 LTS | Run containers in production          |
+| IaC           | Terraform      | 5.0+             | Optional: provision EC2 automatically |
+
+### CI/CD Layer
+
+| Component | Technology     | Version | Purpose                    |
+| --------- | -------------- | ------- | -------------------------- |
+| VCS       | GitHub         | -       | Repository hosting         |
+| Pipeline  | GitHub Actions | -       | Automated build and deploy |
+| Build     | Docker Build   | -       | Create container images    |
+
+### Dashboard Layer
+
+| Component | Technology          | Version   | Purpose                               |
+| --------- | ------------------- | --------- | ------------------------------------- |
+| Backend   | Node.js + Express   | 18-alpine | WebSocket server                      |
+| WebSocket | Socket.io           | 4.x       | Real-time bidirectional communication |
+| Frontend  | Vanilla HTML/CSS/JS | -         | No framework (lightweight)            |
 
 ---
 
