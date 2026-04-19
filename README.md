@@ -33,6 +33,16 @@ PHANTASM is a semester-long DevOps project for SE202L (Development Operations La
 - **Cloud Infrastructure**: Deployed on AWS EC2 with Terraform automation
 - **Real-Time Monitoring**: Dashboard shows health status, request counts and system uptime
 
+### Project Goal
+
+Build a complete system that:
+
+1. Hosts two app versions simultaneously using Docker Compose
+2. Routes traffic between them via Nginx weighted upstream
+3. Displays the deployment process on a real-time WebSocket dashboard
+4. Automatically builds and deploys via GitHub Actions CI/CD pipeline
+5. Demonstrates professional DevOps practices: IaC, containerization, orchestration, and automation
+
 ---
 
 ## Team
