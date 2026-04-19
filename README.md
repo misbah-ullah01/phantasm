@@ -28,6 +28,10 @@ PHANTASM is a semester-long DevOps project for SE202L (Development Operations La
 - **Two Simultaneous Versions**: Blue (v1.0) and Green (v2.0) run at the same time.
 - **Live Traffic Control**: WebSocket dashboard lets you shift traffic between versions in real-time
 - **Zero Downtime**: Users never experience downtime during deployments
+- **Instant Rollback**: Switch back to the previous version in seconds
+- **Automated CI/CD**: GitHub Actions automatically build adn deploys on every push
+- **Cloud Infrastructure**: Deployed on AWS EC2 with Terraform automation
+- **Real-Time Monitoring**: Dashboard shows health status, request counts and system uptime
 
 ---
 
