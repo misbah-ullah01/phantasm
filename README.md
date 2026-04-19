@@ -25,7 +25,9 @@ PHANTASM is a semester-long DevOps project for SE202L (Development Operations La
 
 ### Key Features
 
--
+- **Two Simultaneous Versions**: Blue (v1.0) and Green (v2.0) run at the same time.
+- **Live Traffic Control**: WebSocket dashboard lets you shift traffic between versions in real-time
+- **Zero Downtime**: Users never experience downtime during deployments
 
 ---
 
