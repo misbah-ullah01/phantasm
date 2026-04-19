@@ -1,5 +1,7 @@
 # PHANTASM
 
+[![CI/CD](https://github.com/misbah-ullah01/phantasm/actions/workflows/deploy.yml/badge.svg)](https://github.com/misbah-ullah01/phantasm/actions/workflows/deploy.yml)
+
 > Deploy without a trace
 
 Blue Green zero-downtime deployment visualizer. Two app versions run simultaneously on AWS EC2. A real-time WebSocket Dashboard lets you shift live traffic between them.
