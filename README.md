@@ -13,7 +13,7 @@ Push Code → GitHub Actions builds and deploys → zero downtime.
 1. [Project Overview](#project-overview)
 2. [Architecture & Design](#architecture--design)
 3. [Team Structure & Responsibilities](#team-structure--responsibilities)
-4. [Technology Stack](#tech-stack)
+4. [Technology Stack](#technology-stack)
 
 ---
 
@@ -45,16 +45,7 @@ Build a complete system that:
 
 ---
 
-## Team
-
-| Member         | Role                              |
-| -------------- | --------------------------------- |
-| Misbah Ullah   | Project Lead & Backend Engineer   |
-| Huzaifa Saleh  | DevOps Engineer & CI/CD Architect |
-| Abdul Rauf     | Infrastructure & Cloud Engineer   |
-| Syed Ahsan Ali | Frontend Engineer & QA Lead       |
-
-## Architecture
+## Architecture & Design
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -108,6 +99,32 @@ Build a complete system that:
 
 ---
 
+## Team Structure & Responsibilities
+
+| Member             | Role                              | Primary Responsibilities                                             | Files Owned                                                      |
+| ------------------ | --------------------------------- | -------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Misbah Ullah**   | Project Lead & Backend Engineer   | Repository setup, app development, code review, issue management     | `app/v1/`, `app/v2/`, `controller/`, `README.md`, `.env.example` |
+| **Huzaifa Saleh**  | DevOps Engineer & CI/CD Architect | CI/CD pipeline, Docker Hub setup, GitHub Secrets configuration       | `.github/workflows/deploy.yml`, Docker Hub configuration         |
+| **Abdul Rauf**     | Infrastructure & Cloud Engineer   | Infrastructure-as-Code, Docker Compose, Nginx configuration, AWS EC2 | `docker-compose.yml`, `nginx/nginx.conf`, `terraform/`           |
+| **Syed Ahsan Ali** | Frontend Engineer & QA Lead       | Dashboard development, testing, quality assurance, project report    | `dashboard/`, testing documentation, project report              |
+
+---
+
+## Technology Stack
+
+| Layer          | Technology              |
+| -------------- | ----------------------- |
+| App (x2)       | Node.js + Express       |
+| Traffic Router | Nginx weighted upstream |
+| Orchestration  | Docker Compose          |
+| CI/CD          | GitHub Actions          |
+| Registry       | Docker Hub              |
+| Cloud          | AWS EC2 (Ubuntu 22.04)  |
+| Dashboard      | Node.js + Socket.io     |
+| IaC            | Terraform               |
+
+---
+
 ## Quick Start
 
 ### Prerequisites
@@ -138,16 +155,3 @@ http://YOUR_EC2_ELASTIC_IP
 ```
 
 ---
-
-## Tech Stack
-
-| Layer          | Technology              |
-| -------------- | ----------------------- |
-| App (x2)       | Node.js + Express       |
-| Traffic Router | Nginx weighted upstream |
-| Orchestration  | Docker Compose          |
-| CI/CD          | GitHub Actions          |
-| Registry       | Docker Hub              |
-| Cloud          | AWS EC2 (Ubuntu 22.04)  |
-| Dashboard      | Node.js + Socket.io     |
-| IaC            | Terraform               |
