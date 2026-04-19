@@ -19,6 +19,14 @@ Push Code → GitHub Actions builds and deploys → zero downtime.
 
 ## Project Overview
 
+### What is PHANTASM?
+
+PHANTASM is a semester-long DevOps project for SE202L (Development Operations Lab) that demonstrates **blue-green deployment** - a strategy for achieving zero-downtime application updates.
+
+### Key Features
+
+-
+
 ---
 
 ## Team
