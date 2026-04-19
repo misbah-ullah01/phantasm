@@ -11,7 +11,9 @@ Push Code → GitHub Actions builds and deploys → zero downtime.
 ## Table of Contents
 
 1. [Project Overview](#project-overview)
-2.
+2. [Architecture & Design](#architecture--design)
+3. [Team Structure & Responsibilities](#team-structure--responsibilities)
+4. [Technology Stack](#tech-stack)
 
 ---
 
