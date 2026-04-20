@@ -15,4 +15,7 @@ app.get('/heatlh', (req,res) => {
     res.json ({ status: 'healthy', version: VERSION, color: 'blue', requests: requestCount });    
 });
 
-app.get('metrics')
+app.get('/metrics', (req, res) => {
+    res.json({ requests: reqiestCount, version: VERSION, uptime: process.uptime() });
+});
+
