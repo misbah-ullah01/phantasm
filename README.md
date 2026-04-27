@@ -1,4 +1,5 @@
 # PHANTASM
+![CI/CD](https://github.com/misbah-ullah01/phantasm/actions/workflows/deploy.yml/badge.svg)
 
 [![CI/CD](https://github.com/misbah-ullah01/phantasm/actions/workflows/deploy.yml/badge.svg)](https://github.com/misbah-ullah01/phantasm/actions/workflows/deploy.yml)
 
