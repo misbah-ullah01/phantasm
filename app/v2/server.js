@@ -11,7 +11,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/heatlh', (req,res) => {
+app.get('/health', (req,res) => {
     res.json ({ status: 'healthy', version: VERSION, color: 'green', requests: requestCount });    
 });
 
