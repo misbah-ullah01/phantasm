@@ -1,0 +1,94 @@
+version: '3.8'
+
+networks:
+  phantasm-net:
+    driver: bridge
+
+services:
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - nginx-conf:/etc/nginx/conf.d
+    networks:
+      - phantasm-net
+    depends_on:
+      - blue-app
+      - green-app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  blue-app:
+    image: ${DOCKERHUB_USER}/phantasm-blue:latest
+    container_name: blue-app
+    expose:
+      - "3001"
+    environment:
+      - PORT=3001
+      - APP_VERSION=v1.0
+    networks:
+      - phantasm-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  green-app:
+    image: ${DOCKERHUB_USER}/phantasm-green:latest
+    container_name: green-app
+    expose:
+      - "3002"
+    environment:
+      - PORT=3002
+      - APP_VERSION=v2.0
+    networks:
+      - phantasm-net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  controller:
+    build: ./controller
+    container_name: traffic-controller
+    expose:
+      - "3003"
+    ports:
+      - "3003:3003"
+    volumes:
+      - nginx-conf:/etc/nginx/conf.d
+    networks:
+      - phantasm-net
+    depends_on:
+      - nginx
+    restart: unless-stopped
+
+  dashboard:
+    build: ./dashboard
+    container_name: phantasm-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - BLUE_URL=http://blue-app:3001
+      - GREEN_URL=http://green-app:3002
+      - CONTROLLER_URL=http://controller:3003
+    networks:
+      - phantasm-net
+    depends_on:
+      - controller
+    restart: unless-stopped
+
+volumes:
+  nginx-conf
