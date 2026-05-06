@@ -1,0 +1,31 @@
+version: "3.8"
+
+# Dashboard is intentionally omitted for now; another team member owns it.
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: phantasm-nginx
+    command: /bin/sh -c "if [ ! -f /etc/nginx/conf.d/default.conf ]; then cp /config/default.conf /etc/nginx/conf.d/default.conf; fi && nginx -g 'daemon off;'"
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/config/default.conf:ro
+      - nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      blue-app:
+        condition: service_healthy
+      green-app:
+        condition: service_healthy
+      controller:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
