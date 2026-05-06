@@ -108,5 +108,71 @@
   </div>
 
   <div class="footer-bar">Last update: <span id="last-update">--</span></div>
+<script>
+  const socket = io();
+  const slider = document.getElementById('traffic-slider');
+  let debounceTimer = null;
+
+  socket.on('connect', () => {
+    document.getElementById('connection-status').textContent = 'Connected';
+    document.getElementById('connection-status').style.color = '#1D9E75';
+    addLog('Connected to dashboard server');
+  });
+
+  socket.on('disconnect', () => {
+    document.getElementById('connection-status').textContent = 'Disconnected — reconnecting...';
+    document.getElementById('connection-status').style.color = '#E24B4A';
+    addLog('Lost connection to dashboard server');
+  });	
+
+  socket.on('state', (state) => {
+    setDot('blue-dot', state.blue.status);
+    setDot('green-dot', state.green.status);
+    document.getElementById('blue-count').textContent = state.blue.requests;
+    document.getElementById('green-count').textContent = state.green.requests;
+    document.getElementById('blue-version').textContent = 'version: ' + state.blue.version;
+    document.getElementById('green-version').textContent = 'version: ' + state.green.version;
+    document.getElementById('blue-uptime').textContent = 'uptime: ' + Math.round(state.blue.uptime) + 's';
+    document.getElementById('green-uptime').textContent = 'uptime: ' + Math.round(state.green.uptime) + 's';
+    const b = state.split.blue;
+    const g = state.split.green;
+    document.getElementById('blue-pct').textContent = b;
+    document.getElementById('green-pct').textContent = g;
+    document.getElementById('blue-bar').style.width = b + '%';
+    document.getElementById('green-bar').style.width = g + '%';
+    slider.value = 100 - g;
+    document.getElementById('last-update').textContent = new Date(state.lastUpdate).toLocaleTimeString();
+  });
+
+  socket.on('log', (msg) => addLog(msg));
+
+  function setDot(id, status) {
+    document.getElementById(id).className = 'status-dot ' + status;
+  }
+
+  function addLog(msg) {
+    const li = document.createElement('li');
+    li.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+    const list = document.getElementById('log-list');
+    list.insertBefore(li, list.firstChild);
+    while (list.children.length > 20) list.removeChild(list.lastChild);
+  }
+
+  function setSplit(blue, green) {
+    socket.emit('setSplit', { blue, green });
+    addLog(`Requesting split: Blue ${blue}% / Green ${green}%`);
+  }
+
+  slider.addEventListener('input', () => {
+    const blueVal = parseInt(slider.value);
+    const greenVal = 100 - blueVal;
+    document.getElementById('blue-pct').textContent = blueVal;
+    document.getElementById('green-pct').textContent = greenVal;
+    document.getElementById('blue-bar').style.width = blueVal + '%';
+    document.getElementById('green-bar').style.width = greenVal + '%';
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => setSplit(blueVal, greenVal), 300);
+  });
+</script>
 </body>
 </html>
