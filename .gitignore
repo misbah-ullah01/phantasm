@@ -1,6 +1,7 @@
-/AI_Build_Guide
-/PHANTASM_Detailed_Guide.md
-*.md
-!README.md
-*.env
+AI_Build_Guide/
+PHANTASM_Detailed_Guide.md
+.env
+node_modules/
+*.pem
 *.log
+.DS_Store
