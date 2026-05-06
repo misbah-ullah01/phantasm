@@ -164,15 +164,15 @@ Build a complete system that:
 ```bash
 git clone https://github.com/misbah-ullah01/phantasm.git
 cd phantasm
-cd .env.example .env    # fill in your Docker Hub username
+cp .env.example .env    # fill in your Docker Hub username
 docker compose up --build
 ```
 
 ## Open:
 
 - App: http://localhost
-- Dashboard: http://localhost:3000
-- Controller API: http://localhost:3000/split
+- Dashboard: pending another team member
+- Controller API: http://localhost:3003/split
 
 ### Cloud URL
 

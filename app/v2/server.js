@@ -1,36 +1,39 @@
 const express = require('express');
+
 const app = express();
-const PORT = process.env.port || 3002;
+const PORT = Number(process.env.PORT) || 3002;
 const VERSION = process.env.APP_VERSION || 'v2.0';
 
 let requestCount = 0;
 
 app.use((req, res, next) => {
-  requestCount++;
+  requestCount += 1;
   console.log(`[GREEN][${VERSION}] Request #${requestCount}: ${req.method} ${req.path}`);
   next();
 });
 
-app.get('/heatlh', (req,res) => {
-    res.json ({ status: 'healthy', version: VERSION, color: 'green', requests: requestCount });    
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', version: VERSION, color: 'green', requests: requestCount });
 });
 
 app.get('/metrics', (req, res) => {
-    res.json({ requests: reqiestCount, version: VERSION, uptime: process.uptime() });
+  res.json({ requests: requestCount, version: VERSION, uptime: process.uptime() });
 });
 
 app.get('/', (req, res) => {
-    res.send(`<!DOCTYPE html>
+  res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PHANTASM — Green (${VERSION})</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHANTASM - Green (${VERSION})</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #04342C; color: white; min-height: 100vh; }
-    header { background: #0F6E56; padding: 2rem; display: flex; justify-content: space-between; align-items: center; }
+    header { background: #0F6E56; padding: 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
     h1 { font-size: 2rem; letter-spacing: 2px; }
     .version-badge { background: #1D9E75; padding: 0.5rem 1.2rem; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
+    .search-box { padding: 0.75rem 1rem; border-radius: 999px; border: none; min-width: 240px; background: #085041; color: white; font-size: 0.95rem; }
     .hero { text-align: center; padding: 4rem 2rem; }
     .hero h2 { font-size: 2.5rem; margin-bottom: 1rem; }
     .hero p { font-size: 1.2rem; color: #5DCAA5; max-width: 500px; margin: 0 auto 2rem; }
@@ -40,18 +43,14 @@ app.get('/', (req, res) => {
     .product-card p { color: #5DCAA5; font-size: 0.9rem; }
     .product-card .price { font-size: 1.5rem; font-weight: bold; margin-top: 1rem; color: white; }
     footer { text-align: center; padding: 2rem; color: #1D9E75; font-size: 0.85rem; }
+    @media (max-width: 900px) { .products { grid-template-columns: 1fr; padding: 1.5rem; } header { padding: 1.5rem; } .search-box { width: 100%; } }
   </style>
 </head>
 <body>
   <header>
     <h1>PHANTASM</h1>
-    <span class="version-badge">GREEN — ${VERSION}</span>
-    <input
-        type="text"
-        placeholder="Search products... (new in v2.0)"
-        style="padding:0.5rem 1rem; border-radius:20px; border:none; width:280px;
-        background:#085041; color:white; font-size:0.9rem;"
-    />
+    <input class="search-box" type="search" placeholder="Search products... (new in v2.0)" />
+    <span class="version-badge">GREEN - ${VERSION}</span>
   </header>
   <div class="hero">
     <h2>Product Catalog</h2>
@@ -74,11 +73,11 @@ app.get('/', (req, res) => {
       <div class="price">$59.99</div>
     </div>
   </div>
-  <footer>PHANTASM ${VERSION} — Green Environment — Requests served: ${requestCount}</footer>
+  <footer>PHANTASM ${VERSION} - Green Environment - Requests served: ${requestCount}</footer>
 </body>
 </html>`);
 });
 
 app.listen(PORT, () => {
-    console.log(`PHANTASM Green (${VERSION}) listening on port ${PORT}`);
+  console.log(`PHANTASM Green (${VERSION}) listening on port ${PORT}`);
 });
