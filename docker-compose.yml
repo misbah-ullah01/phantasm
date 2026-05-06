@@ -29,3 +29,43 @@ services:
     networks:
       - phantasm-net
 
+  blue-app:
+    build:
+      context: ./app/v1
+    image: ${DOCKERHUB_USER}/phantasm-blue:latest
+    container_name: phantasm-blue-app
+    environment:
+      PORT: "3001"
+      APP_VERSION: v1.0
+    expose:
+      - "3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
+  green-app:
+    build:
+      context: ./app/v2
+    image: ${DOCKERHUB_USER}/phantasm-green:latest
+    container_name: phantasm-green-app
+    environment:
+      PORT: "3002"
+      APP_VERSION: v2.0
+    expose:
+      - "3002"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
