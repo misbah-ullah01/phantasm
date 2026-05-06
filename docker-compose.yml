@@ -69,3 +69,35 @@ services:
     networks:
       - phantasm-net
 
+  controller:
+    build:
+      context: ./controller
+    image: phantasm-controller:local
+    container_name: phantasm-controller
+    environment:
+      PORT: "3003"
+    ports:
+      - "3003:3003"
+    volumes:
+      - nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      blue-app:
+        condition: service_healthy
+      green-app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
+volumes:
+  nginx-conf:
+
+networks:
+  phantasm-net:
+    driver: bridge
