@@ -1,0 +1,103 @@
+version: "3.8"
+
+# Dashboard is intentionally omitted for now; another team member owns it.
+
+services:
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: phantasm-nginx
+    command: /bin/sh -c "if [ ! -f /etc/nginx/conf.d/default.conf ]; then cp /config/default.conf /etc/nginx/conf.d/default.conf; fi && nginx -g 'daemon off;'"
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/config/default.conf:ro
+      - nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      blue-app:
+        condition: service_healthy
+      green-app:
+        condition: service_healthy
+      controller:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
+  blue-app:
+    build:
+      context: ./app/v1
+    image: ${DOCKERHUB_USER}/phantasm-blue:latest
+    container_name: phantasm-blue-app
+    environment:
+      PORT: "3001"
+      APP_VERSION: v1.0
+    expose:
+      - "3001"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
+  green-app:
+    build:
+      context: ./app/v2
+    image: ${DOCKERHUB_USER}/phantasm-green:latest
+    container_name: phantasm-green-app
+    environment:
+      PORT: "3002"
+      APP_VERSION: v2.0
+    expose:
+      - "3002"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
+  controller:
+    build:
+      context: ./controller
+    image: phantasm-controller:local
+    container_name: phantasm-controller
+    environment:
+      PORT: "3003"
+    ports:
+      - "3003:3003"
+    volumes:
+      - nginx-conf:/etc/nginx/conf.d
+    depends_on:
+      blue-app:
+        condition: service_healthy
+      green-app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3003/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - phantasm-net
+
+volumes:
+  nginx-conf:
+
+networks:
+  phantasm-net:
+    driver: bridge
