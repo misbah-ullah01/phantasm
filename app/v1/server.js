@@ -1,34 +1,36 @@
 const express = require('express');
+
 const app = express();
-const PORT = process.env.port || 3001;
+const PORT = Number(process.env.PORT) || 3001;
 const VERSION = process.env.APP_VERSION || 'v1.0';
 
 let requestCount = 0;
 
 app.use((req, res, next) => {
-  requestCount++;
+  requestCount += 1;
   console.log(`[BLUE][${VERSION}] Request #${requestCount}: ${req.method} ${req.path}`);
   next();
 });
 
-app.get('/health', (req,res) => {
-    res.json ({ status: 'healthy', version: VERSION, color: 'blue', requests: requestCount });    
+app.get('/health', (req, res) => {
+  res.json({ status: 'healthy', version: VERSION, color: 'blue', requests: requestCount });
 });
 
 app.get('/metrics', (req, res) => {
-    res.json({ requests: reqiestCount, version: VERSION, uptime: process.uptime() });
+  res.json({ requests: requestCount, version: VERSION, uptime: process.uptime() });
 });
 
 app.get('/', (req, res) => {
-    res.send(`<!DOCTYPE html>
+  res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PHANTASM — Blue (${VERSION})</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHANTASM - Blue (${VERSION})</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; background: #042C53; color: white; min-height: 100vh; }
-    header { background: #185FA5; padding: 2rem; display: flex; justify-content: space-between; align-items: center; }
+    header { background: #185FA5; padding: 2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
     h1 { font-size: 2rem; letter-spacing: 2px; }
     .version-badge { background: #378ADD; padding: 0.5rem 1.2rem; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
     .hero { text-align: center; padding: 4rem 2rem; }
@@ -40,12 +42,13 @@ app.get('/', (req, res) => {
     .product-card p { color: #85B7EB; font-size: 0.9rem; }
     .product-card .price { font-size: 1.5rem; font-weight: bold; margin-top: 1rem; color: white; }
     footer { text-align: center; padding: 2rem; color: #378ADD; font-size: 0.85rem; }
+    @media (max-width: 900px) { .products { grid-template-columns: 1fr; padding: 1.5rem; } header { padding: 1.5rem; } }
   </style>
 </head>
 <body>
   <header>
     <h1>PHANTASM</h1>
-    <span class="version-badge">BLUE — ${VERSION}</span>
+    <span class="version-badge">BLUE - ${VERSION}</span>
   </header>
   <div class="hero">
     <h2>Product Catalog</h2>
@@ -68,11 +71,11 @@ app.get('/', (req, res) => {
       <div class="price">$59.99</div>
     </div>
   </div>
-  <footer>PHANTASM ${VERSION} — Blue Environment — Requests served: ${requestCount}</footer>
+  <footer>PHANTASM ${VERSION} - Blue Environment - Requests served: ${requestCount}</footer>
 </body>
 </html>`);
 });
 
 app.listen(PORT, () => {
-    console.log(`PHANTASM Blue (${VERSION}) listening on port ${PORT}`);
+  console.log(`PHANTASM Blue (${VERSION}) listening on port ${PORT}`);
 });
