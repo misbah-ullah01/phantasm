@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PHANTASM — Control Dashboard</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #0A0A14; color: #E0E0E0; min-height: 100vh; }
+    header { background: #12122A; border-bottom: 2px solid #534AB7; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { color: #AFA9EC; font-size: 1.5rem; letter-spacing: 3px; }
+    header .subtitle { color: #534AB7; font-size: 0.8rem; margin-top: 2px; }
+    #connection-status { font-size: 0.8rem; }
+    .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; padding: 1.5rem; }
+    .card { background: #12122A; border: 1px solid #2A2A4A; border-radius: 12px; padding: 1.5rem; }
+    .card h2 { font-size: 0.75rem; color: #534AB7; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.25rem; }
+    .env-row { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #1E1E3A; }
+    .env-row:last-child { border-bottom: none; }
+    .status-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; transition: background 0.5s, box-shadow 0.5s; }
+    .status-dot.healthy { background: #1D9E75; box-shadow: 0 0 8px #1D9E75; }
+    .status-dot.unhealthy { background: #E24B4A; box-shadow: 0 0 8px #E24B4A; }
+    .status-dot.unknown { background: #888780; }
+    .env-label { font-weight: bold; min-width: 55px; font-size: 0.9rem; }
+    .env-label.blue { color: #378ADD; }
+    .env-label.green { color: #1D9E75; }
+    .env-meta { flex: 1; }
+    .env-meta .version { font-size: 0.8rem; color: #888780; }
+    .env-meta .uptime { font-size: 0.75rem; color: #555570; }
+    .request-count { font-size: 1.8rem; font-weight: bold; min-width: 60px; text-align: right; }
+    .request-count.blue { color: #378ADD; }
+    .request-count.green { color: #1D9E75; }
+    .split-labels { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .split-label-blue { color: #378ADD; font-weight: bold; font-size: 1.1rem; }
+    .split-label-green { color: #1D9E75; font-weight: bold; font-size: 1.1rem; }
+    input[type=range] { width: 100%; height: 6px; accent-color: #7F77DD; cursor: pointer; margin: 0.75rem 0; }
+    .split-bar { height: 8px; border-radius: 4px; display: flex; overflow: hidden; margin: 0.5rem 0 1rem; }
+    .split-bar .blue-fill { background: #185FA5; transition: width 0.4s ease; }
+    .split-bar .green-fill { background: #0F6E56; transition: width 0.4s ease; }
+    .preset-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .preset-btn { padding: 0.4rem 0.9rem; border: 1px solid #2A2A4A; border-radius: 6px; background: transparent; color: #E0E0E0; cursor: pointer; font-size: 0.8rem; transition: background 0.2s; }
+    .preset-btn:hover { background: #1E1E3A; }
+    .log-panel { grid-column: 1 / -1; }
+    .log-list { list-style: none; max-height: 140px; overflow-y: auto; }
+    .log-list li { font-size: 0.8rem; color: #888780; padding: 0.25rem 0; border-bottom: 1px solid #1A1A2A; font-family: monospace; }
+    .log-list li:first-child { color: #AFA9EC; }
+    .footer-bar { text-align: right; padding: 0.5rem 1.5rem; font-size: 0.75rem; color: #2A2A4A; }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>PHANTASM</h1>
+      <div class="subtitle">Blue-Green Deployment Control Dashboard</div>
+    </div>
+    <div id="connection-status" style="color: #E24B4A;">Connecting...</div>
+  </header>
+
+  <div class="main-grid">
+    <div class="card">
+      <h2>Environment Status</h2>
+      <div class="env-row">
+        <div class="status-dot unknown" id="blue-dot"></div>
+        <span class="env-label blue">BLUE</span>
+        <div class="env-meta">
+          <div class="version" id="blue-version">version: --</div>
+          <div class="uptime" id="blue-uptime">uptime: --</div>
+        </div>
+        <div class="request-count blue" id="blue-count">0</div>
+      </div>
+      <div class="env-row">
+        <div class="status-dot unknown" id="green-dot"></div>
+        <span class="env-label green">GREEN</span>
+        <div class="env-meta">
+          <div class="version" id="green-version">version: --</div>
+          <div class="uptime" id="green-uptime">uptime: --</div>
+        </div>
+        <div class="request-count green" id="green-count">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Traffic Control</h2>
+      <div class="split-labels">
+        <span class="split-label-blue">Blue <span id="blue-pct">100</span>%</span>
+        <span class="split-label-green"><span id="green-pct">0</span>% Green</span>
+      </div>
+      <input type="range" id="traffic-slider" min="0" max="100" value="100" step="5">
+      <div class="split-bar">
+        <div class="blue-fill" id="blue-bar" style="width:100%"></div>
+        <div class="green-fill" id="green-bar" style="width:0%"></div>
+      </div>
+      <div class="preset-buttons">
+        <button class="preset-btn" onclick="setSplit(100,0)">100% Blue</button>
+        <button class="preset-btn" onclick="setSplit(90,10)">90 / 10</button>
+        <button class="preset-btn" onclick="setSplit(50,50)">50 / 50</button>
+        <button class="preset-btn" onclick="setSplit(10,90)">10 / 90</button>
+        <button class="preset-btn" onclick="setSplit(0,100)">100% Green</button>
+      </div>
+    </div>
+
+    <div class="card log-panel">
+      <h2>Event Log</h2>
+      <ul class="log-list" id="log-list">
+        <li>Dashboard started — waiting for system state...</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bar">Last update: <span id="last-update">--</span></div>
+</body>
+</html>
