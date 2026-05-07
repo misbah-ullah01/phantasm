@@ -1,7 +1,7 @@
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const http = require('http');
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3003;
@@ -35,16 +35,31 @@ server {
 
   location / {
     proxy_pass http://app_backend;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     proxy_connect_timeout 5s;
     proxy_read_timeout 10s;
   }
 
+  location /dashboard/ {
+    proxy_pass http://phantasm-dashboard:3000/;
+    proxy_set_header Host \$host;
+    proxy_set_header X-Real-IP \$remote_addr;
+    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+  }
+
+  location /socket.io/ {
+    proxy_pass http://phantasm-dashboard:3000/socket.io/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection "Upgrade";
+    proxy_set_header Host \$host;
+  }
+
   location /health {
     default_type text/plain;
-    return 200 'nginx ok\n';
+    return 200 'nginx ok\\n';
   }
 
   location /nginx-status {
@@ -63,7 +78,7 @@ app.get('/split', (req, res) => {
   res.json(currentSplit);
 });
 
-app.post('/split', (req, res) => {
+app.post('/split', async (req, res) => {
   const { blue, green } = req.body;
 
   if (typeof blue !== 'number' || typeof green !== 'number') {
@@ -81,7 +96,24 @@ app.post('/split', (req, res) => {
   try {
     fs.mkdirSync(path.dirname(NGINX_CONF_PATH), { recursive: true });
     fs.writeFileSync(NGINX_CONF_PATH, config, 'utf8');
-    execSync('nginx -s reload', { stdio: 'pipe' });
+
+    // Signal nginx to reload by sending HUP via the Docker API
+    const options = {
+      socketPath: '/var/run/docker.sock',
+      path: '/containers/phantasm-nginx/kill?signal=HUP',
+      method: 'POST'
+    };
+
+    const reload = new Promise((resolve, reject) => {
+      const req = http.request(options, (res) => {
+        if (res.statusCode === 204 || res.statusCode === 200) resolve();
+        else reject(new Error(`Nginx reload returned status ${res.statusCode}`));
+      });
+      req.on('error', reject);
+      req.end();
+    });
+
+    await reload;
     currentSplit = { blue, green };
     console.log(`[CONTROLLER] Traffic split updated: blue=${blue}% green=${green}%`);
     res.json({ success: true, split: currentSplit });
