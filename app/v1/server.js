@@ -61,7 +61,7 @@ app.get('/', (req, res) => {
       <div class="price">$49.99</div>
     </div>
     <div class="product-card">
-      <h3>Docker Deep Dive</h3>
+      <h3>Docker Deep Drive</h3>
       <p>Master containerization from first principles to production orchestration.</p>
       <div class="price">$39.99</div>
     </div>
