@@ -20,6 +20,13 @@ app.get('/metrics', (req, res) => {
   res.json({ requests: requestCount, version: VERSION, uptime: process.uptime() });
 });
 
+// ERROR INITIATED: The Chaos Monkey Route
+// Hitting this endpoint will instantly kill the Node.js process and crash the container.
+app.get('/crash', (req, res) => {
+  console.error(`[FATAL ERROR] Administrator triggered a manual crash on Green (${VERSION})!`);
+  process.exit(1); 
+});
+
 app.get('/', (req, res) => {
   res.send(`<!DOCTYPE html>
 <html lang="en">
