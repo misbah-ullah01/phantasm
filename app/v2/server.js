@@ -53,7 +53,7 @@ app.get('/', (req, res) => {
     <span class="version-badge">GREEN - ${VERSION}</span>
   </header>
   <div class="hero">
-    <h2>Samaan Catalog</h2>
+    <h2>Product Catalog</h2>
     <p>Stable production version. Zero downtime. Always available.</p>
   </div>
   <div class="products">
